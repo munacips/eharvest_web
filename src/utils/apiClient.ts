@@ -53,7 +53,7 @@ export const getApiClient = (): AxiosInstance => {
 export const apiCall = async <T>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     endpoint: string,
-    data?: any,
+    data?: never,
     config?: AxiosRequestConfig
 ): Promise<T> => {
     const client = getApiClient();
@@ -78,15 +78,15 @@ export const apiGet = <T>(endpoint: string, config?: AxiosRequestConfig): Promis
     return apiCall('GET', endpoint, undefined, config);
 };
 
-export const apiPost = <T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const apiPost = <T>(endpoint: string, data?: never, config?: AxiosRequestConfig): Promise<T> => {
     return apiCall('POST', endpoint, data, config);
 };
 
-export const apiPut = <T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const apiPut = <T>(endpoint: string, data?: never, config?: AxiosRequestConfig): Promise<T> => {
     return apiCall('PUT', endpoint, data, config);
 };
 
-export const apiPatch = <T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const apiPatch = <T>(endpoint: string, data?: never, config?: AxiosRequestConfig): Promise<T> => {
     return apiCall('PATCH', endpoint, data, config);
 };
 

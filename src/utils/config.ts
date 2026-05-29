@@ -5,6 +5,9 @@ export const API_CONFIG = {
     // Backend base URL - change this to your actual backend URL
     BASE_URL: env.VITE_API_URL || 'http://localhost:8080',
 
+    // AI services base URL (FastAPI)
+    AI_BASE_URL: env.VITE_AI_API_URL || 'http://localhost:8000',
+
     // API endpoints
     ENDPOINTS: {
         // Authentication
@@ -33,6 +36,7 @@ export const API_CONFIG = {
         SUBSCRIPTION_DETAIL: '/api/v1/subscriptions/:id',
         SUBSCRIPTION_FARMER: '/api/v1/subscriptions/farmer/:id',
         SUBSCRIPTION_BUYER: '/api/v1/subscriptions/buyer/:id',
+        SUBSCRIPTION_PROCESS: '/api/v1/subscriptions/:id/process',
 
         // Logistics
         LOGISTICS_REQUESTS: '/api/v1/logistics',
@@ -52,6 +56,7 @@ export const API_CONFIG = {
         REVIEWS: '/api/v1/reviews',
         REVIEWS_BY_REVIEWER: '/api/v1/reviews/reviewer/:id',
         REVIEWS_BY_REVIEWEE: '/api/v1/reviews/reviewee/:id',
+        REVIEWS_PENDING_REVIEWER: '/api/v1/reviews/pending/reviewer/:id',
 
         // Chat
         CHAT_CONVERSATIONS: '/api/v1/chat/conversations',
@@ -67,16 +72,20 @@ export const API_CONFIG = {
         FCM_TOKEN_DEREGISTER: '/api/notifications/deactivate-token',
 
         // AI Services
-        AI_FORECAST_COMMODITY: '/api/ai/forecast/:commodity',
-        AI_DEMAND_SUPPLY_FORECAST: '/api/ai/forecast/demand-supply',
-        AI_WEATHER_INTEGRATION: '/api/ai/integrations/weather',
-        AI_MARKET_PRICES: '/api/ai/integrations/market-prices',
-        AI_PRESCRIPTIVE_RECOMMENDATIONS: '/api/ai/recommendations/prescriptive',
-        AI_TRUST_SCORE: '/api/ai/trust-score/:userId',
-        AI_PREDICT_PRICE: '/api/ai/predict-price',
-        AI_PRICING_SCHEMA: '/api/ai/pricing/schema',
-        AI_PRICING_BATCH: '/api/ai/pricing/batch',
-        AI_PRICING_AUTO: '/api/ai/pricing/auto',
+        AI_FORECAST_COMMODITY: '/forecast/:commodity',
+        AI_DEMAND_SUPPLY_FORECAST: '/forecast/demand-supply',
+        AI_WEATHER_INTEGRATION: '/integrations/weather',
+        AI_MARKET_PRICES: '/integrations/market-prices',
+        AI_PRESCRIPTIVE_RECOMMENDATIONS: '/recommendations/prescriptive',
+        AI_TRUST_SCORE: '/trust-score/:userId',
+        AI_PREDICT_PRICE: '/predict-price',
+        AI_PRICING_SCHEMA: '/pricing/schema',
+        AI_PRICING_BATCH: '/pricing/batch',
+        AI_PRICING_AUTO: '/pricing/auto',
+
+        // Reports
+        REPORTS_AVAILABLE: '/api/reports/available',
+        REPORTS_GENERATE: '/api/reports/generate/:reportName',
     },
 
     // WebSocket configuration

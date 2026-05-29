@@ -17,10 +17,10 @@ export const DashboardPage: React.FC = () => {
         const loadDashboardData = async () => {
             try {
                 setIsLoading(true);
-                const [produce, trustScore] = await Promise.all([
+                const [produce, trustScoreResponse] = (await Promise.all([
                     ProductService.getAllProduce(1, 5),
-                    user?.id ? AIService.getTrustScore(user.id) : Promise.resolve(0),
-                ]);
+                    user?.id ? AIService.getTrustScore(user.id) : Promise.resolve(null),
+                ])) as [Awaited<ReturnType<typeof ProductService.getAllProduce>>, unknown];
 
                 setRecentProduce(produce.data);
 
@@ -34,10 +34,33 @@ export const DashboardPage: React.FC = () => {
                             ? (await OrderService.getFarmerOrders()).length
                             : (await PaymentService.getPaymentHistory()).total;
 
+                type TrustScoreResponse = { trust_score: number; scale?: number };
+
+                const isTrustScoreResponse = (value: unknown): value is TrustScoreResponse =>
+                    typeof value === 'object' &&
+                    value !== null &&
+                    'trust_score' in value &&
+                    typeof (value as { trust_score: unknown }).trust_score === 'number';
+
+                const toPercent = (score: number, scale = 5) => {
+                    if (!Number.isFinite(score) || !Number.isFinite(scale) || scale <= 0) {
+                        return 0;
+                    }
+
+                    return Math.round((score / scale) * 100);
+                };
+
+                const resolvedTrustScore =
+                    typeof trustScoreResponse === 'number'
+                        ? toPercent(trustScoreResponse)
+                        : isTrustScoreResponse(trustScoreResponse)
+                            ? toPercent(trustScoreResponse.trust_score, trustScoreResponse.scale ?? 5)
+                            : toPercent(user?.trustScore || 0);
+
                 setStats({
                     activeListings,
                     totalSales,
-                    trustScore: trustScore || user?.trustScore || 0,
+                    trustScore: resolvedTrustScore,
                     balance,
                 });
             } catch (error) {
@@ -81,7 +104,7 @@ export const DashboardPage: React.FC = () => {
                     />
                     <StatCard
                         title="Trust Score"
-                        value={`${stats.trustScore}/5`}
+                        value={`${stats.trustScore}/100`}
                         icon={<TrendingUp size={24} />}
                         color="purple"
                     />

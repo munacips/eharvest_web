@@ -121,10 +121,15 @@ export interface ProduceSubscription {
     farmerId: string;
     frequency: SubscriptionFrequency;
     status: SubscriptionStatus;
+    requiresLogistics?: boolean;
+    pickupAddress?: string | null;
+    currency?: 'USD' | 'ZIG' | string;
     items: SubscriptionItem[];
     totalAmount: number;
     startDate: string;
     nextDeliveryDate: string;
+    buyerName?: string;
+    farmerName?: string;
 }
 
 export interface SubscriptionItem {
@@ -193,9 +198,22 @@ export interface Review {
     reviewerId: string;
     reviewerName: string;
     revieweeId: string;
+    orderId?: string;
+    status?: string;
+    revieweeName?: string;
+    revieweeRole?: string;
     rating: number;
     comment: string;
     createdAt: string;
+}
+
+// Reports
+export interface ReportDescriptor {
+    reportName: string;
+    label: string;
+    description: string;
+    allowedRoles: string[];
+    params: string[];
 }
 
 // Payment Types
@@ -233,6 +251,31 @@ export interface SeasonRecommendation {
     recommendation: string;
 }
 
+export interface ForecastPoint {
+    date: string;
+    value: number;
+}
+
+export interface DemandSupplySeries {
+    commodity: string;
+    demandValues: number[];
+    supplyValues: number[];
+}
+
+export interface MarketTarget {
+    name: string;
+    avgPrice?: number;
+}
+
+export interface PrescriptiveRecommendation {
+    commodity: string;
+    score: number;
+    climateFit: boolean;
+    estimatedCostUsd?: number;
+    plantingMonths: number[];
+    marketTargets: MarketTarget[];
+}
+
 // Heatmap Data
 export interface SupplyPoint {
     id: string;
@@ -242,4 +285,10 @@ export interface SupplyPoint {
     longitude: number;
     availableProduce: Produce[];
     trustScore: number;
+}
+
+export interface HeatmapPoint {
+    latitude: number;
+    longitude: number;
+    normalizedWeight: number;
 }

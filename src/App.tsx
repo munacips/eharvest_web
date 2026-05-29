@@ -15,10 +15,16 @@ import {
   LoginPage,
   OrdersPage,
   PaymentReturnPage,
+  PendingReviewsPage,
+  ReportRequestPage,
+  ReportViewerPage,
+  ReportsPage,
   SupplyMapPage,
   SignupPage,
   SplashPage,
   SellPage,
+  SubscriptionDetailPage,
+  SubscriptionFormPage,
   SubscriptionsPage,
 } from './pages';
 
@@ -72,6 +78,30 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <SubscriptionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/subscriptions/new"
+            element={
+              <ProtectedRoute>
+                <SubscriptionFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/subscriptions/:id"
+            element={
+              <ProtectedRoute>
+                <SubscriptionDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/subscriptions/:id/edit"
+            element={
+              <ProtectedRoute>
+                <SubscriptionFormPage />
               </ProtectedRoute>
             }
           />
@@ -136,6 +166,38 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <ReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/view"
+            element={
+              <ProtectedRoute>
+                <ReportViewerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/:reportName"
+            element={
+              <ProtectedRoute>
+                <ReportRequestPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pending-reviews"
+            element={
+              <ProtectedRoute>
+                <PendingReviewsPage />
               </ProtectedRoute>
             }
           />

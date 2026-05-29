@@ -7,9 +7,12 @@ import { AuthService } from './AuthService';
 export class SubscriptionService {
     static async createSubscription(data: {
         farmerId: string;
-        items: { produceId: string; quantity: number }[];
-        frequency: SubscriptionFrequency;
+        items: { produceId: string; quantity: number; unitPrice?: number }[];
+        frequency: SubscriptionFrequency | string;
         startDate: string;
+        requiresLogistics?: boolean;
+        pickupAddress?: string | null;
+        currency?: string;
     }): Promise<ProduceSubscription> {
         const payload = await apiPost<Record<string, unknown>>(API_CONFIG.ENDPOINTS.SUBSCRIPTIONS, data);
         return mapSubscription(payload);
@@ -36,7 +39,13 @@ export class SubscriptionService {
 
     static async updateSubscription(
         id: string,
-        data: Partial<ProduceSubscription>
+        data: Partial<ProduceSubscription> & {
+            items?: { produceId: string; quantity: number; unitPrice?: number }[];
+            frequency?: SubscriptionFrequency | string;
+            requiresLogistics?: boolean;
+            pickupAddress?: string | null;
+            currency?: string;
+        }
     ): Promise<ProduceSubscription> {
         const payload = await apiPut<Record<string, unknown>>(API_CONFIG.ENDPOINTS.SUBSCRIPTION_DETAIL.replace(':id', id), data);
         return mapSubscription(payload);
@@ -62,6 +71,11 @@ export class SubscriptionService {
 
     static async resumeSubscription(id: string): Promise<ProduceSubscription> {
         const payload = await apiPost<Record<string, unknown>>(`${API_CONFIG.ENDPOINTS.SUBSCRIPTIONS}/${id}/resume`, {});
+        return mapSubscription(payload);
+    }
+
+    static async processSubscription(id: string): Promise<ProduceSubscription> {
+        const payload = await apiPost<Record<string, unknown>>(API_CONFIG.ENDPOINTS.SUBSCRIPTION_PROCESS.replace(':id', id), {});
         return mapSubscription(payload);
     }
 }

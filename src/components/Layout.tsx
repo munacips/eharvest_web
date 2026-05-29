@@ -66,6 +66,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             { label: 'Market Insights', path: '/market-insights' },
             { label: 'Supply Heatmap', path: '/supply-map' },
             { label: 'Subscriptions', path: '/subscriptions' },
+            { label: 'Reports', path: '/reports' },
+            { label: 'Pending Reviews', path: '/pending-reviews' },
         ];
 
         if (role === 'buyer') {
@@ -204,8 +206,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     key={`${item.path}-${item.label}`}
                                     onClick={() => navigate(item.path)}
                                     className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-green-50 text-green-700 hover:bg-green-100'
+                                        ? 'bg-green-600 text-white'
+                                        : 'bg-green-50 text-green-700 hover:bg-green-100'
                                         }`}
                                 >
                                     {item.label}

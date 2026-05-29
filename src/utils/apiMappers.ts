@@ -78,6 +78,15 @@ const readObject = (source: Record<string, unknown>, keys: string[]): Record<str
     return null;
 };
 
+const resolveDisplayName = (payload: Record<string, unknown> | null, fallback: string): string => {
+    if (!payload) return fallback;
+    const first = readString(payload, ['firstName', 'first_name']);
+    const last = readString(payload, ['lastName', 'last_name']);
+    const full = `${first} ${last}`.trim();
+    if (full) return full;
+    return readString(payload, ['username'], fallback);
+};
+
 export const extractList = <T>(payload: unknown, mapper: (item: Record<string, unknown>) => T): T[] => {
     if (Array.isArray(payload)) {
         return payload.map((item) => mapper(toRecord(item)));
@@ -178,10 +187,15 @@ export const mapSubscription = (payload: Record<string, unknown>): ProduceSubscr
     farmerId: readString(payload, ['farmerId', 'farmer_id']),
     frequency: readString(payload, ['frequency']).toLowerCase().replace('biweekly', 'bi-weekly') as ProduceSubscription['frequency'],
     status: readString(payload, ['status']).toLowerCase() as ProduceSubscription['status'],
+    requiresLogistics: readBoolean(payload, ['requiresLogistics', 'requires_logistics']),
+    pickupAddress: readString(payload, ['pickupAddress', 'pickup_address'], '') || null,
+    currency: readString(payload, ['currency'], 'USD'),
     items: readArray(payload, ['items']).map((item) => mapSubscriptionItem(toRecord(item))),
     totalAmount: readNumber(payload, ['totalAmount', 'total_amount']),
     startDate: readString(payload, ['startDate', 'start_date'], new Date().toISOString()),
     nextDeliveryDate: readString(payload, ['nextDeliveryDate', 'next_delivery_date'], new Date().toISOString()),
+    buyerName: resolveDisplayName(readObject(payload, ['buyer']), `Buyer #${readString(payload, ['buyerId', 'buyer_id'])}`),
+    farmerName: resolveDisplayName(readObject(payload, ['farmer']), `Farmer #${readString(payload, ['farmerId', 'farmer_id'])}`),
 });
 
 export const mapLogisticsRequest = (payload: Record<string, unknown>): LogisticsRequest => ({
@@ -218,6 +232,10 @@ export const mapReview = (payload: Record<string, unknown>): Review => ({
     reviewerId: readString(payload, ['reviewerId', 'reviewer_id']),
     reviewerName: readString(readObject(payload, ['reviewer']) ?? {}, ['username', 'firstName', 'first_name'], 'Reviewer'),
     revieweeId: readString(payload, ['revieweeId', 'reviewee_id']),
+    orderId: readString(payload, ['orderId', 'order_id'], readString(readObject(payload, ['order']) ?? {}, ['id'])),
+    status: readString(payload, ['status']),
+    revieweeName: resolveDisplayName(readObject(payload, ['reviewee']), 'Reviewee'),
+    revieweeRole: readString(readObject(payload, ['reviewee']) ?? {}, ['role']),
     rating: readNumber(payload, ['rating']),
     comment: readString(payload, ['comment']),
     createdAt: readString(payload, ['createdAt', 'created_at'], new Date().toISOString()),

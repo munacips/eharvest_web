@@ -1,13 +1,25 @@
+import type { AxiosRequestConfig } from 'axios';
 import { apiGet, apiPost } from '../utils/apiClient';
 import { API_CONFIG } from '../utils/config';
-import type { PricePrediction, MarketInsight, SeasonRecommendation } from '../types';
+import type { PricePrediction, MarketInsight } from '../types';
+
+const withAiBaseUrl = (config?: AxiosRequestConfig): AxiosRequestConfig => ({
+    ...config,
+    baseURL: API_CONFIG.AI_BASE_URL,
+});
+
+const aiGet = <T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> =>
+    apiGet(endpoint, withAiBaseUrl(config));
+
+const aiPost = <T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
+    apiPost(endpoint, data, withAiBaseUrl(config));
 
 export class AIService {
     static async predictPrice(
         commodity: string,
         quantity: number
     ): Promise<PricePrediction> {
-        return apiPost(API_CONFIG.ENDPOINTS.AI_PREDICT_PRICE, {
+        return aiPost(API_CONFIG.ENDPOINTS.AI_PREDICT_PRICE, {
             commodity,
             quantity,
         });
@@ -15,33 +27,37 @@ export class AIService {
 
     static async forecastCommodity(
         commodity: string,
-        days: number = 30
+        options: { periods?: number; region?: string; visual?: boolean } = {}
     ): Promise<any> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_FORECAST_COMMODITY.replace(':commodity', encodeURIComponent(commodity)), {
-            params: { commodity, days },
+        const { periods = 30, region, visual = false } = options;
+        return aiGet(API_CONFIG.ENDPOINTS.AI_FORECAST_COMMODITY.replace(':commodity', encodeURIComponent(commodity)), {
+            params: {
+                periods,
+                visual,
+                region,
+            },
         });
     }
 
-    static async getDemandSupplyForecast(
-        commodity: string,
-        region?: string
-    ): Promise<any> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_DEMAND_SUPPLY_FORECAST, {
-            params: { commodity, region },
-        });
+    static async demandSupplyForecast(payload: {
+        region: string;
+        periods: number;
+        commodities: string[];
+    }): Promise<any> {
+        return aiPost(API_CONFIG.ENDPOINTS.AI_DEMAND_SUPPLY_FORECAST, payload);
     }
 
-    static async getSeasonRecommendations(
-        region?: string,
-        season?: string
-    ): Promise<SeasonRecommendation[]> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_PRESCRIPTIVE_RECOMMENDATIONS, {
-            params: { region, season },
-        });
+    static async prescriptiveRecommendations(payload: {
+        region: string;
+        season?: string | null;
+        month?: number | null;
+        budget_usd: number;
+    }): Promise<any> {
+        return aiPost(API_CONFIG.ENDPOINTS.AI_PRESCRIPTIVE_RECOMMENDATIONS, payload);
     }
 
     static async getMarketInsights(commodity?: string): Promise<MarketInsight[]> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_MARKET_PRICES, {
+        return aiGet(API_CONFIG.ENDPOINTS.AI_MARKET_PRICES, {
             params: { commodity },
         });
     }
@@ -50,7 +66,7 @@ export class AIService {
         latitude: number,
         longitude: number
     ): Promise<any> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_WEATHER_INTEGRATION, {
+        return aiGet(API_CONFIG.ENDPOINTS.AI_WEATHER_INTEGRATION, {
             params: { latitude, longitude },
         });
     }
@@ -61,24 +77,24 @@ export class AIService {
         destinationLat: number,
         destinationLng: number
     ): Promise<any> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_PRICING_AUTO, {
+        return aiGet(API_CONFIG.ENDPOINTS.AI_PRICING_AUTO, {
             params: { originLat, originLng, destinationLat, destinationLng },
         });
     }
 
     static async getTrustScore(userId: string): Promise<number> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_TRUST_SCORE.replace(':userId', encodeURIComponent(userId)));
+        return aiGet(API_CONFIG.ENDPOINTS.AI_TRUST_SCORE.replace(':userId', encodeURIComponent(userId)));
     }
 
     static async getPricingSchema(): Promise<any> {
-        return apiGet(API_CONFIG.ENDPOINTS.AI_PRICING_SCHEMA);
+        return aiGet(API_CONFIG.ENDPOINTS.AI_PRICING_SCHEMA);
     }
 
     static async getBatchPricing(payload: unknown): Promise<any> {
-        return apiPost(API_CONFIG.ENDPOINTS.AI_PRICING_BATCH, payload);
+        return aiPost(API_CONFIG.ENDPOINTS.AI_PRICING_BATCH, payload);
     }
 
     static async getAutoPricing(payload: unknown): Promise<any> {
-        return apiPost(API_CONFIG.ENDPOINTS.AI_PRICING_AUTO, payload);
+        return aiPost(API_CONFIG.ENDPOINTS.AI_PRICING_AUTO, payload);
     }
 }

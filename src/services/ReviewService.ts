@@ -2,6 +2,7 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../utils/apiClient';
 import { API_CONFIG } from '../utils/config';
 import type { Review } from '../types';
 import { extractList, mapReview } from '../utils/apiMappers';
+import { AuthService } from './AuthService';
 
 export class ReviewService {
     static async createReview(data: {
@@ -28,9 +29,25 @@ export class ReviewService {
         return extractList(payload, mapReview);
     }
 
+    static async getPendingReviewsForCurrentUser(): Promise<Review[]> {
+        const reviewerId = AuthService.getUserId();
+        if (!reviewerId) return [];
+        const payload = await apiGet<unknown>(API_CONFIG.ENDPOINTS.REVIEWS_PENDING_REVIEWER.replace(':id', reviewerId));
+        return extractList(payload, mapReview).filter(
+            (review) => (review.status ?? '').toLowerCase() === 'pending'
+        );
+    }
+
     static async updateReview(id: string, data: Partial<Review>): Promise<Review> {
         const payload = await apiPut<Record<string, unknown>>(`${API_CONFIG.ENDPOINTS.REVIEWS}/${id}`, data);
         return mapReview(payload);
+    }
+
+    static async submitPendingReview(id: string, rating: number, comment: string): Promise<Review> {
+        if (rating < 1 || rating > 5) {
+            throw new Error('Rating must be between 1 and 5.');
+        }
+        return this.updateReview(id, { rating, comment });
     }
 
     static async deleteReview(id: string): Promise<void> {

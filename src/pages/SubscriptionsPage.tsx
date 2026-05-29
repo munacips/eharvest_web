@@ -4,9 +4,11 @@ import { SubscriptionService } from '../services';
 import type { ProduceSubscription } from '../types';
 import { Calendar, Pause, RotateCcw, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const SubscriptionsPage: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [subscriptions, setSubscriptions] = useState<ProduceSubscription[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -64,13 +66,23 @@ export const SubscriptionsPage: React.FC = () => {
     return (
         <Layout>
             <div className="space-y-8">
-                <div>
-                    <h1 className="text-4xl font-bold text-gray-900">Subscriptions</h1>
-                    <p className="text-gray-600 mt-2">
-                        {user?.role === 'farmer'
-                            ? 'Review recurring buyer commitments and upcoming deliveries'
-                            : 'Manage recurring produce deliveries'}
-                    </p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 className="text-4xl font-bold text-gray-900">Subscriptions</h1>
+                        <p className="text-gray-600 mt-2">
+                            {user?.role === 'farmer'
+                                ? 'Review recurring buyer commitments and upcoming deliveries'
+                                : 'Manage recurring produce deliveries'}
+                        </p>
+                    </div>
+                    {user?.role === 'buyer' && (
+                        <button
+                            onClick={() => navigate('/subscriptions/new')}
+                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                        >
+                            New subscription
+                        </button>
+                    )}
                 </div>
 
                 {isLoading ? (
@@ -87,7 +99,13 @@ export const SubscriptionsPage: React.FC = () => {
                             <div key={sub.id} className="bg-white rounded-lg shadow-md p-6">
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900">Subscription #{sub.id.slice(0, 8)}</h3>
+                                        <button
+                                            onClick={() => navigate(`/subscriptions/${sub.id}`)}
+                                            className="text-left"
+                                        >
+                                            <h3 className="text-xl font-bold text-gray-900">Subscription #{sub.id.slice(0, 8)}</h3>
+                                            <p className="text-sm text-gray-500">View details</p>
+                                        </button>
                                         <p className="text-sm text-gray-600 mt-1 capitalize">
                                             {sub.frequency} delivery
                                         </p>

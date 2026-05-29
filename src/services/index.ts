@@ -7,4 +7,6 @@ export { LogisticsService } from './LogisticsService';
 export { ReviewService } from './ReviewService';
 export { ChatService } from './ChatService';
 export { AIService } from './AIService';
+export { SupplyHeatmapService } from './SupplyHeatmapService';
 export { NotificationService } from './NotificationService';
+export { ReportService } from './ReportService';
